@@ -49,5 +49,4 @@ TO DO:
    the module (e.g. show.php, edit.php, and so on)
 2) include reference to the HumHub guide for each section, where useful for user
 3) Remove unnecessary code
-4) Try to insert automatically the tables into the views/widgets (DONE)
-5) Check all the pending "\\to do"
+4) Check all the pending "\\to do"
