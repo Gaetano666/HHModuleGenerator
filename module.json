@@ -1,0 +1,10 @@
+{
+    "id": "generator",
+    "name": "Generator",
+    "description": "Generator Modules",
+    "keywords": ["yii2", "humhub", "generator","modules"],
+    "version": "1.0.0",
+    "humhub": {
+        "minVersion": "0.20"
+    }
+}
