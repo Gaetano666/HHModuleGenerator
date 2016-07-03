@@ -71,7 +71,7 @@ class <?=ucwords($generator->moduleID)?>Controller extends ContentContainerContr
         $model = <?=$generator->modelClass?>::findOne(['id' => $id]);
         
         if (!$model->content->canWrite()) {
-            throw new HttpException(403, 'Access denied!'); //to do: translate
+            throw new HttpException(403, 'Access denied!');
         }
         if ($model->load(Yii::$app->request->post())) {
             // Reload record to get populated updated_at field

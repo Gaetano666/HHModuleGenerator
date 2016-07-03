@@ -92,7 +92,6 @@ class Generator extends \yii\gii\Generator
             [['modelClass'],'required'],
             [['modelClass'], 'match', 'pattern' => '/^[\w\\-]+$/', 'message' => 'Only word characters and dashes are allowed.'],
             [['modelClass'], 'validateModelClass', 'skipOnEmpty' => false],
-            //to do: reenter this once the module is able to generate the Model automatically
             [['tableName'],'required'],
             [['tableName'], 'validateTableName'],
             [['tableName'], 'match', 'pattern' => '/^[\w\\-]+$/', 'message' => 'Only word characters and dashes are allowed.'],
@@ -110,7 +109,7 @@ class Generator extends \yii\gii\Generator
             'moduleClass' => 'Module Class',
             'moduleDsc' => 'Module Description',
             'author' => 'Author',
-            'tableName' => 'Model table name', //to do: reenter this once the module is able to generate the Model automatically
+            'tableName' => 'Model table name',
             'modelClass' => 'Model class'
         ];
     }
@@ -333,49 +332,6 @@ EOD;
     	return ltrim(substr($className, 0, $pos), '\\');
     }
 
-    
-    public function generateModel($modulePath) {
-            //to do
-            $files = [];
-            $relations = $this->generateRelations();
-            $db = $this->getDbConnection();
-            $ns = $this->moduleNamespace(); //useful?
-            
-            foreach ($this->getTableNames() as $tableName) {
-            // model :
-                $modelClassName = $this->generateClassName($tableName);
-                $queryClassName = ($this->generateQuery) ? $this->generateQueryClassName($modelClassName) : false;
-                $tableSchema = $db->getTableSchema($tableName);
-                $params = [
-                    'tableName' => $tableName,
-                    'className' => $modelClassName,
-                    'queryClassName' => $queryClassName,
-                    'tableSchema' => $tableSchema,
-                    'labels' => $this->generateLabels($tableSchema),
-                    'rules' => $this->generateRules($tableSchema),
-                    'relations' => isset($relations[$tableName]) ? $relations[$tableName] : [],
-                ];
-                $files[] = new CodeFile(
-                    //Yii::getAlias('@' . str_replace('\\', '/', $this->moduleNamespace())) . '/' . $modelClassName . '.php',
-                    $modulePath . '/model/Test.php',
-                    $this->render('model.php', $params)
-                );
-
-            
-            }
-
-        
-            
-            
-//            $files[] = new CodeFile(
-//                $modulePath . '/model/Test.php',
-//                $this->render("model.php")
-//                );
-            
-            
-            return $files;
-    }
-    
     /**
      * Validates the [[modelClass]] attribute.
      */
