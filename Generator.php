@@ -92,6 +92,7 @@ class Generator extends \yii\gii\Generator
             [['modelClass'],'required'],
             [['modelClass'], 'match', 'pattern' => '/^[\w\\-]+$/', 'message' => 'Only word characters and dashes are allowed.'],
             [['modelClass'], 'validateModelClass', 'skipOnEmpty' => false],
+            //to do: reenter this once the module is able to generate the Model automatically
             [['tableName'],'required'],
             [['tableName'], 'validateTableName'],
             [['tableName'], 'match', 'pattern' => '/^[\w\\-]+$/', 'message' => 'Only word characters and dashes are allowed.'],
@@ -109,7 +110,7 @@ class Generator extends \yii\gii\Generator
             'moduleClass' => 'Module Class',
             'moduleDsc' => 'Module Description',
             'author' => 'Author',
-            'tableName' => 'Model table name',
+            'tableName' => 'Model table name', //to do: reenter this once the module is able to generate the Model automatically
             'modelClass' => 'Model class'
         ];
     }
@@ -332,6 +333,49 @@ EOD;
     	return ltrim(substr($className, 0, $pos), '\\');
     }
 
+    
+    public function generateModel($modulePath) {
+            //to do
+            $files = [];
+            $relations = $this->generateRelations();
+            $db = $this->getDbConnection();
+            $ns = $this->moduleNamespace(); //useful?
+            
+            foreach ($this->getTableNames() as $tableName) {
+            // model :
+                $modelClassName = $this->generateClassName($tableName);
+                $queryClassName = ($this->generateQuery) ? $this->generateQueryClassName($modelClassName) : false;
+                $tableSchema = $db->getTableSchema($tableName);
+                $params = [
+                    'tableName' => $tableName,
+                    'className' => $modelClassName,
+                    'queryClassName' => $queryClassName,
+                    'tableSchema' => $tableSchema,
+                    'labels' => $this->generateLabels($tableSchema),
+                    'rules' => $this->generateRules($tableSchema),
+                    'relations' => isset($relations[$tableName]) ? $relations[$tableName] : [],
+                ];
+                $files[] = new CodeFile(
+                    //Yii::getAlias('@' . str_replace('\\', '/', $this->moduleNamespace())) . '/' . $modelClassName . '.php',
+                    $modulePath . '/model/Test.php',
+                    $this->render('model.php', $params)
+                );
+
+            
+            }
+
+        
+            
+            
+//            $files[] = new CodeFile(
+//                $modulePath . '/model/Test.php',
+//                $this->render("model.php")
+//                );
+            
+            
+            return $files;
+    }
+    
     /**
      * Validates the [[modelClass]] attribute.
      */
@@ -810,5 +854,50 @@ EOD;
             $tableName = '{{' . $matches[1] . '%}}';
         }
         return $tableName;
+    }
+    
+    /**
+     * Generates relations using a junction table by adding an extra viaTable().
+     * @param \yii\db\TableSchema the table being checked
+     * @param array $fks obtained from the checkJunctionTable() method
+     * @param array $relations
+     * @return array modified $relations
+     */
+    private function generateManyManyRelations($table, $fks, $relations)
+    {
+        $db = $this->getDbConnection();
+
+        foreach ($fks as $pair) {
+            list($firstKey, $secondKey) = $pair;
+            $table0 = $firstKey[0];
+            $table1 = $secondKey[0];
+            unset($firstKey[0], $secondKey[0]);
+            $className0 = $this->generateClassName($table0);
+            $className1 = $this->generateClassName($table1);
+            $table0Schema = $db->getTableSchema($table0);
+            $table1Schema = $db->getTableSchema($table1);
+
+            $link = $this->generateRelationLink(array_flip($secondKey));
+            $viaLink = $this->generateRelationLink($firstKey);
+            $relationName = $this->generateRelationName($relations, $table0Schema, key($secondKey), true);
+            $relations[$table0Schema->fullName][$relationName] = [
+                "return \$this->hasMany($className1::className(), $link)->viaTable('"
+                . $this->generateTableName($table->name) . "', $viaLink);",
+                $className1,
+                true,
+            ];
+
+            $link = $this->generateRelationLink(array_flip($firstKey));
+            $viaLink = $this->generateRelationLink($secondKey);
+            $relationName = $this->generateRelationName($relations, $table1Schema, key($firstKey), true);
+            $relations[$table1Schema->fullName][$relationName] = [
+                "return \$this->hasMany($className0::className(), $link)->viaTable('"
+                . $this->generateTableName($table->name) . "', $viaLink);",
+                $className0,
+                true,
+            ];
+        }
+
+        return $relations;
     }
 }

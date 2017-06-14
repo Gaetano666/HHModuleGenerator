@@ -4,9 +4,8 @@ HumHub Modules Generator
 Installation
 ---------------------------
 
-step-1. Install module in /protected/modules
-step-2. Rename main folder to "generator" 
-step-3. In /protected/humhub/config/web.php
+step-1. Install module in humhub/protected/modules
+step-2. In humhub/protected/humhub/config/web.php
 
 ```
     'modules' =>[

@@ -9,7 +9,7 @@
     echo $form->field($generator, 'moduleClass');
     echo $form->field($generator, 'moduleID');
     echo $form->field($generator, 'author');
-    echo $form->field($generator, 'tableName');
+    echo $form->field($generator, 'tableName'); //to do: reenter this once the module is able to generate the Model automatically
     echo $form->field($generator, 'modelClass');
     echo $form->field($generator, 'moduleDsc')->textarea();
 ?>
