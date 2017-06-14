@@ -71,7 +71,7 @@ class <?=ucwords($generator->moduleID)?>Controller extends ContentContainerContr
         $model = <?=$generator->modelClass?>::findOne(['id' => $id]);
         
         if (!$model->content->canWrite()) {
-            throw new HttpException(403, 'Access denied!');
+            throw new HttpException(403, 'Access denied!'); //to do: translate
         }
         if ($model->load(Yii::$app->request->post())) {
             // Reload record to get populated updated_at field
@@ -103,7 +103,7 @@ class <?=ucwords($generator->moduleID)?>Controller extends ContentContainerContr
             <?= '$mypostmodel->'.$name.'=Yii::$app->request->post(\''.$name.'\')'?>;
         <?php endforeach; ?>
         
-        return \<?=$generator->moduleNamespace()?>\widgets\WallCreateForm::create($mypostmodel);
+        return \<?=$generator->moduleNamespace()?>\widgets\WallCreateForm::create($mypostmodel, $this->contentContainer);
     }
     
     /**
